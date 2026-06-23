@@ -1,23 +1,30 @@
 # Image Quality Assessment & Enhancement Web App
 
-This project is a full-stack image quality assessment and enhancement system built with a `Next.js` frontend and a `Flask + OpenCV` backend.
+A full-stack web application that assesses image quality before enhancement and only applies OpenCV-based improvement when the image actually needs it.
 
-The app follows an assessment-first workflow:
-- upload an image
-- preview the original image
-- assess image quality using measurable metrics
-- avoid enhancement if the image is already above the quality threshold
-- otherwise apply targeted enhancement based on the detected issues
-- compare original and processed outputs side by side
-- review before/after metrics and download the result
+## What It Does
 
-## Project Highlights
-
-- Quality-first image processing pipeline
-- Adaptive OpenCV enhancement instead of one fixed filter for every image
-- Automatic decision to preserve already-good images
-- Before/after quality metrics and overall rating
-- Frontend assessment panel and downloadable enhanced output
+- Upload and preview an image
+- Measure image quality using:
+  - brightness
+  - contrast
+  - sharpness
+  - noise
+  - dynamic range
+  - colorfulness
+- Compute an overall quality score and rating
+- Skip enhancement when quality is already `>= 90%`
+- Detect issues such as:
+  - low brightness
+  - low contrast
+  - soft details
+  - visible noise
+  - limited dynamic range
+  - muted colors
+- Apply targeted OpenCV enhancement only when required
+- Show original vs processed output side by side
+- Display before/after metrics and improvement summary
+- Download the processed image
 
 ## Tech Stack
 
@@ -25,7 +32,6 @@ The app follows an assessment-first workflow:
 - Next.js
 - React
 - TypeScript
-- CSS
 
 ### Backend
 - Flask
@@ -33,7 +39,7 @@ The app follows an assessment-first workflow:
 - OpenCV
 - NumPy
 
-## Repository Structure
+## Project Structure
 
 ```text
 IITB_proj2/
@@ -41,83 +47,67 @@ IITB_proj2/
   requirements.txt
   README.md
   docs/
-    PROJECT_REPORT.md
     Image_Quality_Assessment_Report.docx
     Image_Quality_Assessment_Presentation.pptx
   frontend/
     package.json
-    src/
-      app/
-        page.tsx
-        globals.css
-        layout.tsx
+    src/app/
+      page.tsx
+      globals.css
+      layout.tsx
 ```
 
 ## Core Workflow
 
-1. The user uploads an image in the frontend.
-2. The frontend previews the original image and sends it to the Flask backend.
-3. The backend computes image quality metrics:
-   - brightness
-   - contrast
-   - sharpness
-   - noise
-   - dynamic range
-   - colorfulness
-4. The backend converts those metrics into an overall quality score and rating.
-5. If the score is `>= 90`, the original image is preserved and the backend reports that no improvement is required.
-6. If the score is below `90`, the backend detects issues such as:
-   - low brightness
-   - low contrast
-   - soft details
-   - visible noise
-   - limited dynamic range
-   - muted colors
-7. Based on the detected issues, the backend selects suitable enhancement modes and chooses the best result.
-8. The frontend displays:
-   - original image
-   - processed image
-   - original metrics
-   - enhanced metrics
-   - overall quality
-   - assessment decision
-   - metric-wise improvements
+1. User uploads an image.
+2. Frontend previews the original image.
+3. Backend computes image quality metrics.
+4. Backend converts the metrics into an overall quality score and rating.
+5. If quality is `>= 90%`, the original image is preserved.
+6. If quality is below `90%`, the backend identifies the image issues and selects suitable enhancement modes.
+7. Best candidate output is returned to the frontend.
+8. Frontend shows original image, result image, assessment, metrics, and download option.
 
-## Backend Pipeline Summary
+## Backend Logic
 
-The backend enhancement pipeline uses:
+The backend uses an assessment-first pipeline:
+
+- image decoding
+- metric computation
+- overall quality scoring
+- issue detection
+- candidate-mode selection
+- adaptive enhancement
+- best-candidate scoring
+
+### OpenCV Enhancement Stages
+
 - gray-world white balance
 - adaptive gamma correction
-- CLAHE on the luminance channel
-- selective luminance lifting for darker regions
+- CLAHE on luminance
+- selective luminance lift
 - adaptive denoising
 - unsharp masking
 - highlight and shadow protection
 - natural color preservation
 
-Multiple candidate outputs are evaluated using a scoring function, and the best-scoring candidate is returned.
+## Quality Decision Rule
 
-## Quality Assessment Logic
-
-The backend computes an overall image quality score from the measured metrics. The score is then mapped to a rating:
-
-- `95+` → Excellent
-- `85+` → Very Good
-- `70+` → Good
-- `55+` → Fair
-- below `55` → Needs Improvement
-
-The app currently uses:
+The application uses:
 
 ```python
 GOOD_QUALITY_THRESHOLD = 90.0
 ```
 
-If the original image crosses that threshold, the system skips enhancement and returns the original image unchanged.
+If the uploaded image score is already above this threshold, the backend returns:
+- `pipeline = "preserved_original"`
+- original image unchanged
+- original and enhanced metrics as the same values
+- a message stating that no improvement is required
 
-## How To Run
+## Run Locally
 
-## Backend
+### Backend
 
 From the project root:
 
@@ -128,28 +118,28 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The backend runs on:
+Backend URL:
 
 ```text
 http://127.0.0.1:5000
 ```
 
-## Frontend
+### Frontend
 
-From the `frontend` directory:
+From the `frontend` folder:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-The frontend runs on:
+Frontend URL:
 
 ```text
 http://localhost:3000
 ```
 
-## API Response Shape
+## API Output
 
 The `/upload` endpoint returns:
 
@@ -164,40 +154,13 @@ The `/upload` endpoint returns:
 - `improvements`
 - `enhanced_image`
 
-## Current Features
+## Deliverables
 
-- Upload and preview image
-- Quality assessment before enhancement
-- Conditional enhancement based on quality threshold
-- Targeted enhancement based on detected issues
-- Side-by-side original and processed images
-- Quality score and rating display
-- Detailed metrics and improvement summary
-- Download option for processed output
+- Report docx: [Image_Quality_Assessment_Report.docx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Report.docx)
+- Presentation deck: [Image_Quality_Assessment_Presentation.pptx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Presentation.pptx)
 
 ## Limitations
 
-- This is a classical computer vision pipeline, not a deep learning model.
-- It improves many common issues but cannot perfectly reconstruct information lost in severely blurred or heavily damaged images.
-- There is no semantic segmentation or object-level reasoning in the current version.
-
-## Future Scope
-
-- Face-aware enhancement
-- Foreground/background selective enhancement
-- Blur-specific recovery branch
-- Document cleanup mode
-- Object detection and region-aware enhancement
-- Segmentation-assisted enhancement
-
-## Deliverables
-
-The repository includes:
-- Project README
-- Detailed project report in markdown and DOCX
-- Presentation deck in PPTX format
-
-See:
-- [PROJECT_REPORT.md](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/PROJECT_REPORT.md)
-- [Image_Quality_Assessment_Report.docx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Report.docx)
-- [Image_Quality_Assessment_Presentation.pptx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Presentation.pptx)
+- Classical computer vision pipeline, not a deep learning model
+- No semantic segmentation or object detection
+- Severe blur and missing detail cannot be perfectly reconstructed
