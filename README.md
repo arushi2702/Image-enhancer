@@ -156,7 +156,7 @@ The `/upload` endpoint returns:
 
 ## Deliverables
 
-- Report docx: [Image_Quality_Assessment_Report.docx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Report.docx)
+- Report: [Image_Quality_Assessment_Report.docx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Report.docx)
 - Presentation deck: [Image_Quality_Assessment_Presentation.pptx](/C:/Users/Arushi/Desktop/Important/IITB_proj2/docs/Image_Quality_Assessment_Presentation.pptx)
 
 ## Limitations
